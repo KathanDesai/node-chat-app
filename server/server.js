@@ -17,18 +17,16 @@ var io = socketIO(server);
 io.on('connection', (socket) => {
     console.log('New user connected');
 
-    socket.emit('newMessage', {
-        from: 'kathan',
-        text: 'some text',
-        createdAt: Date()
-    });
-
     socket.on('disconnect', () => {
         console.log('Disconnected from server');
     });
 
     socket.on('createMessage', (message) => {
-        console.log('create Message: ', message);
+        io.emit('newMessage', {
+            from: message.from,
+            text: message.text,
+            createdAt: new Date().getTime()
+        });
     });
 });
 
