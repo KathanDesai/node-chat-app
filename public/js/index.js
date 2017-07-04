@@ -7,19 +7,41 @@ socket.on('disconnect', function () {
     console.log('Disconnected from server');
 });
 
+function scrollToBottom() {
+    var messages = jQuery('#allMessages');
+    var newMessage = messages.children('li:last-child');
+    var clientHeight = messages.prop('clientHeight');
+    var scrollTop = messages.prop('scrollTop');
+    var scrollHeight = messages.prop('scrollHeight');
+    var newMessageHeight = newMessage.innerHeight();
+    var lastMessageHeight = newMessage.prev().innerHeight();
+    if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
+        messages.scrollTop(scrollHeight);
+    }
+};
+
 socket.on('newMessage', function (newMessage) {
-    var li = jQuery('<li></li>');
-    li.text(`${newMessage.from} on ${newMessage.createdAt}: ${newMessage.text}`);
-    jQuery("#allMessages").append(li);
+    var template = jQuery('#message-template').html();
+    var formattedTime = moment(newMessage.createdAt).format('h:mm a');
+    var html = Mustache.render(template, {
+        text: newMessage.text,
+        from: newMessage.from,
+        time: formattedTime
+    });
+    jQuery('#allMessages').append(html);
+    scrollToBottom();
 });
 
 socket.on('newLocationMessage', function (newLocationMessage) {
-    var li = jQuery('<li></li>');
-    var a = jQuery('<a target="_blank">My current location</a>')
-    a.attr('href', newLocationMessage.url);
-    li.text(`${newLocationMessage.from} on ${newLocationMessage.createdAt}: `);
-    li.append(a);
-    jQuery("#allMessages").append(li);
+    var template = jQuery('#location-message-template').html();
+    var formattedTime = moment(newLocationMessage.createdAt).format('h:mm a');
+    var html = Mustache.render(template, {
+        url: newLocationMessage.url,
+        from: newLocationMessage.from,
+        time: formattedTime
+    });
+    jQuery('#allMessages').append(html);
+    scrollToBottom();
 });
 
 jQuery("#message-form").on('submit', function (e) {
