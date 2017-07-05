@@ -7,11 +7,11 @@ var generateMessage = (from, text) => {
     };
 };
 
-var generateLocationMessage = (location) => {
+var generateLocationMessage = (from, location) => {
     return {
         url: `https://www.google.com/maps?q=${location.latitude},${location.longitude}`,
         createdAt: moment().valueOf(),
-        from: location.from
+        from: from
     };
 };
 
